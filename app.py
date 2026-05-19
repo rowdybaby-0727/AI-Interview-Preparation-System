@@ -1,13 +1,21 @@
 import streamlit as st
 import random
 from difflib import SequenceMatcher
-import speech_recognition as sr
-import time
 import pandas as pd
+import time
 
-# -----------------------------------
+# -----------------------------
+# SAFE SPEECH RECOGNITION IMPORT
+# -----------------------------
+
+try:
+    import speech_recognition as sr
+except:
+    sr = None
+
+# -----------------------------
 # PAGE CONFIG
-# -----------------------------------
+# -----------------------------
 
 st.set_page_config(
     page_title="AI Interview Preparation System",
@@ -15,47 +23,52 @@ st.set_page_config(
     layout="wide"
 )
 
-# -----------------------------------
+# -----------------------------
 # TITLE
-# -----------------------------------
+# -----------------------------
 
 st.title("🎯 AI Interview Preparation System")
 
 st.write("Practice Technical Interviews with AI")
 
-# -----------------------------------
+# -----------------------------
 # QUESTION DATABASE
-# -----------------------------------
+# -----------------------------
 
 questions = {
+
     "Python": {
+
         "What is Python?":
-        "Python is a high-level programming language used for AI, web development and automation.",
+        "Python is a high-level programming language used for AI, automation and web development.",
 
         "Explain OOPs concepts in Python.":
         "OOP concepts include encapsulation, inheritance, polymorphism and abstraction.",
 
         "What is GIL in Python?":
-        "GIL stands for Global Interpreter Lock which allows only one thread to execute at a time."
+        "GIL stands for Global Interpreter Lock which allows only one thread execution at a time."
     },
 
     "Cloud Computing": {
+
         "What is Cloud Computing?":
-        "Cloud computing provides servers, storage and software over the internet.",
+        "Cloud computing provides computing services like storage, servers and databases over the internet.",
 
         "Explain IaaS, PaaS and SaaS.":
-        "IaaS provides infrastructure, PaaS provides platform and SaaS provides software."
+        "IaaS provides infrastructure, PaaS provides platform and SaaS provides software services."
     },
 
     "Machine Learning": {
+
         "What is Machine Learning?":
-        "Machine Learning allows systems to learn from data without explicit programming.",
+        "Machine Learning enables systems to learn from data without explicit programming.",
 
         "What is overfitting?":
         "Overfitting occurs when a model performs well on training data but poorly on new data."
     },
 
     "HR Questions": {
+
         "Tell me about yourself.":
         "I am a Computer Science student passionate about AI, Cloud Computing and Web Development.",
 
@@ -64,9 +77,9 @@ questions = {
     }
 }
 
-# -----------------------------------
+# -----------------------------
 # SIDEBAR
-# -----------------------------------
+# -----------------------------
 
 st.sidebar.title("⚙ Interview Settings")
 
@@ -76,28 +89,30 @@ domain = st.sidebar.selectbox(
 )
 
 difficulty = st.sidebar.selectbox(
-    "Difficulty Level",
+    "Select Difficulty",
     ["Easy", "Medium", "Hard"]
 )
 
-# -----------------------------------
+# -----------------------------
 # RANDOM QUESTION
-# -----------------------------------
+# -----------------------------
 
-question = random.choice(list(questions[domain].keys()))
+question = random.choice(
+    list(questions[domain].keys())
+)
 
 st.subheader("🧠 Interview Question")
 
 st.info(question)
 
-# -----------------------------------
-# TIMER SYSTEM
-# -----------------------------------
+# -----------------------------
+# TIMER
+# -----------------------------
 
 st.subheader("⏳ Mock Interview Timer")
 
 minutes = st.slider(
-    "Set Timer (Minutes)",
+    "Select Timer Duration",
     1,
     5,
     2
@@ -124,54 +139,59 @@ if st.button("Start Timer"):
 
     st.error("Time Up!")
 
-# -----------------------------------
+# -----------------------------
 # ANSWER INPUT
-# -----------------------------------
+# -----------------------------
 
-st.subheader("✍ Type Your Answer")
+st.subheader("✍ Write Your Answer")
 
 user_answer = st.text_area(
-    "Write your answer here..."
+    "Type your answer here..."
 )
 
-# -----------------------------------
+# -----------------------------
 # VOICE INPUT
-# -----------------------------------
+# -----------------------------
 
 st.subheader("🎤 Voice Input")
 
-if st.button("Start Voice Recording"):
+if sr is not None:
 
-    recognizer = sr.Recognizer()
+    if st.button("Start Voice Input"):
 
-    try:
+        recognizer = sr.Recognizer()
 
-        with sr.Microphone() as source:
+        try:
 
-            st.info("Listening... Speak Now")
+            with sr.Microphone() as source:
 
-            audio = recognizer.listen(source)
+                st.info("Speak now...")
 
-            text = recognizer.recognize_google(audio)
+                audio = recognizer.listen(source)
 
-            st.success("Voice Recognized Successfully")
+                text = recognizer.recognize_google(audio)
 
-            st.write("### Recognized Text")
+                st.success("Voice Recognized Successfully")
 
-            st.write(text)
+                st.write(text)
 
-            user_answer = text
+                user_answer = text
 
-    except:
-        st.error("Microphone Error or Voice Not Clear")
+        except:
+            st.error("Voice input not supported on deployment.")
 
-# -----------------------------------
+else:
+
+    st.warning("Speech Recognition module not available.")
+
+# -----------------------------
 # EVALUATION
-# -----------------------------------
+# -----------------------------
 
 if st.button("Evaluate Answer"):
 
     if user_answer.strip() == "":
+
         st.warning("Please enter your answer.")
 
     else:
@@ -190,24 +210,39 @@ if st.button("Evaluate Answer"):
 
         st.metric("Score", f"{score}/100")
 
+        # -----------------------------
         # FEEDBACK
+        # -----------------------------
+
         if score >= 80:
             st.success("Excellent Answer!")
+
         elif score >= 60:
             st.warning("Good Answer. Can improve more.")
+
         else:
             st.error("Needs Improvement.")
 
+        # -----------------------------
         # WORD COUNT
+        # -----------------------------
+
         word_count = len(user_answer.split())
 
         st.write(f"### Word Count: {word_count}")
 
+        # -----------------------------
         # IDEAL ANSWER
+        # -----------------------------
+
         with st.expander("View Ideal Answer"):
+
             st.write(ideal_answer)
 
-        # AI FEEDBACK
+        # -----------------------------
+        # AI SUGGESTIONS
+        # -----------------------------
+
         st.subheader("💡 AI Suggestions")
 
         suggestions = []
@@ -218,27 +253,31 @@ if st.button("Evaluate Answer"):
         if score < 60:
             suggestions.append("Add more technical explanation.")
 
+        if domain == "Python":
+            if "python" not in user_answer.lower():
+                suggestions.append("Include Python-related keywords.")
+
         if domain == "Cloud Computing":
             if "cloud" not in user_answer.lower():
                 suggestions.append("Mention cloud-related concepts.")
 
-        if domain == "Python":
-            if "python" not in user_answer.lower():
-                suggestions.append("Include Python keywords.")
-
         if len(suggestions) == 0:
+
             st.success("Professional Answer.")
+
         else:
+
             for s in suggestions:
                 st.write("✅", s)
 
-        # -----------------------------------
+        # -----------------------------
         # PERFORMANCE DASHBOARD
-        # -----------------------------------
+        # -----------------------------
 
         st.subheader("📈 Performance Dashboard")
 
         data = {
+
             "Metric": [
                 "Answer Score",
                 "Word Count",
@@ -256,9 +295,9 @@ if st.button("Evaluate Answer"):
 
         st.table(df)
 
-        # -----------------------------------
+        # -----------------------------
         # WEAK AREA ANALYSIS
-        # -----------------------------------
+        # -----------------------------
 
         st.subheader("⚠ Weak Area Analysis")
 
@@ -271,14 +310,17 @@ if st.button("Evaluate Answer"):
             weak_areas.append("Communication Skills")
 
         if len(weak_areas) == 0:
+
             st.success("No major weak areas detected.")
+
         else:
+
             for area in weak_areas:
                 st.write("❌", area)
 
-        # -----------------------------------
-        # ATS STYLE SCORE
-        # -----------------------------------
+        # -----------------------------
+        # ATS SCORE
+        # -----------------------------
 
         st.subheader("📄 ATS Style Score")
 
@@ -288,22 +330,24 @@ if st.button("Evaluate Answer"):
 
         st.write(f"ATS Score: {ats_score}/100")
 
-        # -----------------------------------
+        # -----------------------------
         # PROGRESS TRACKING
-        # -----------------------------------
+        # -----------------------------
 
         st.subheader("🚀 Progress Tracking")
 
         if score >= 80:
             st.success("Interview Ready")
+
         elif score >= 60:
             st.warning("Need More Practice")
+
         else:
             st.error("Beginner Level")
 
-# -----------------------------------
-# RESUME BASED QUESTIONS
-# -----------------------------------
+# -----------------------------
+# RESUME UPLOAD
+# -----------------------------
 
 st.subheader("📂 Resume Based Interview")
 
@@ -316,16 +360,16 @@ if uploaded_file is not None:
 
     st.success("Resume Uploaded Successfully")
 
-    st.write("Sample Resume-Based Questions:")
+    st.write("### Sample Resume-Based Questions")
 
     st.write("• Explain your projects.")
     st.write("• What technologies have you used?")
     st.write("• Describe your internship experience.")
     st.write("• Explain your Machine Learning project.")
 
-# -----------------------------------
+# -----------------------------
 # FOOTER
-# -----------------------------------
+# -----------------------------
 
 st.markdown("---")
 
