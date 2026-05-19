@@ -1,4 +1,10 @@
 streamlit
-SpeechRecognition
 pandas
+SpeechRecognition
 pyaudio
+torch
+torchvision
+transformers
+sentence-transformers
+scikit-learn
+numpy
