@@ -1,5 +1,10 @@
 # AI Interview Preparation System 🚀
 
+<p align="center">
+  <img width="3584" height="1184" alt="hero banner" src="https://github.com/user-attachments/assets/32fbd7a2-7ac1-4a08-86b2-9e6bc15f4698" />
+
+</p>
+
 ### Intelligent AI-Powered Mock Interview & Interview Evaluation Platform
 
 <p align="center">
@@ -292,6 +297,7 @@ Features:
 * Voice interaction support
 
 ---
+<img width="2816" height="1536" alt="responsive design" src="https://github.com/user-attachments/assets/89b78283-c2de-411f-ad86-17b0d629f72d" />
 
 # 🚀 Future Enhancements
 
