@@ -8,7 +8,7 @@
 ### Intelligent AI-Powered Mock Interview & Interview Evaluation Platform
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.10-blue?style=for-the-badge&logo=python">
+  <img src="https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python">
   <img src="https://img.shields.io/badge/Streamlit-WebApp-red?style=for-the-badge&logo=streamlit">
   <img src="https://img.shields.io/badge/AI-Gemini/OpenAI-success?style=for-the-badge">
   <img src="https://img.shields.io/badge/NLP-LangChain-orange?style=for-the-badge">
